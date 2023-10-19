@@ -1,0 +1,13 @@
+{
+  "name": "social-thoughts",
+  "version": "1.0.0",
+  "description": "A social network API created by using MongoDB and Mongoose.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "mon": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
