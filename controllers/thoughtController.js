@@ -8,10 +8,10 @@ module.exports = {
         try {
             const thoughts = await Thought.find();
 
-            const thoughtObj = {
-                thoughts
-            };
-            res.json(thoughtObj);
+            // const thoughtObj = {
+            //     thoughts
+            // };
+            res.json(thoughts);
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);
@@ -38,7 +38,12 @@ module.exports = {
     async createThought(req, res) {
         try {
             const newThought = await Thought.create(req.body);
-            res.json(newThought);
+            const pushThought = await User.findByIdAndUpdate(
+                req.body.userId,
+                { $addToSet: { thoughts: newThought._id } },
+                { runValidators: true, new: true },
+            );
+            res.status(200).json({ newThought, pushThought });
         } catch (err) {
             res.status(500).json(err);
         }
@@ -67,6 +72,11 @@ module.exports = {
     async deleteThought(req, res) {
         try {
             const destroyThought = await Thought.findOneAndDelete({ _id: req.params.thoughtId });
+            await User.findOneAndUpdate(
+                { thoughts: req.params.thoughtId },
+                { $pull: { thoughts: req.params.thoughtId } },
+                { new: true }
+            )
 
             if (!destroyThought) {
                 res.status(404).json({ message: "No though found with that id" })
@@ -103,9 +113,9 @@ module.exports = {
     //Deletes a reaction by the reaction's reactionId value
     async deleteReaction(req, res) {
         try {
-            const reaction = await Thought.findOneAndDelete(
+            const reaction = await Thought.findOneAndUpdate(
                 { _id: req.params.thoughtId },
-                { $pull: { reactionId: { ObjectId: req.params.ObjectId } } },
+                { $pull: { reactions: { reactionId: req.params.reactionId } } },
                 { runValidators: true, new: true }
             );
 

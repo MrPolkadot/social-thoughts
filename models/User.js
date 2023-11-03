@@ -12,12 +12,10 @@ const userSchema = new Schema(
             type: String,
             unique: true,
             required: true,
-            validate: {
-                validator: function (v) {
-                    return /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/.test(v);
-                },
-                message: email => `${email.value} is not a valid email!`
-            }
+            match: [
+                /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/,
+                "Invalid email address",
+            ],
         },
         thoughts: [
             {
@@ -31,18 +29,21 @@ const userSchema = new Schema(
                 ref: "User"
             }
         ],
+    },
+    {
         toJSON: {
-            virtuals: true
-        }
+            virtuals: true,
+        },
+        id: false,
     }
-)
+);
 
 //Retrieves the length of the user's friends array field on query.
 userSchema.virtual("friendCount").get(function () {
     return this.friends.length;
 });
 
-const User = model("user", userSchema);
+const User = model("User", userSchema);
 
 
 

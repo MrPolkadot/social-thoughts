@@ -32,7 +32,7 @@ module.exports = {
 
             const userObject = {
                 users,
-                userCount: await userCount(),
+                user_total: await userCount(),
             };
 
             res.json(userObject);
@@ -46,16 +46,15 @@ module.exports = {
     //Get a single user by ID
     async getSingleUser(req, res) {
         try {
-            const singleUser = await User.findOne({ _id: req.params.userId });
+            const singleUser = await User.findOne({ _id: req.params.userId })
+                .populate("thoughts")
+                .populate("friends")
 
             if (!singleUser) {
                 return res.status(404).json({ message: "No user with that ID" });
             }
 
-            res.json({
-                singleUser,
-                userData: await userData(req.params.userId),
-            });
+            res.json(singleUser);
 
         } catch (err) {
             console.log(err);
@@ -94,7 +93,7 @@ module.exports = {
     //Deletes user by its _id(DELETE)
     async deleteUser(req, res) {
         try {
-            const destroyUser = await User.findOneAndRemove({ _id: req.params.userId });
+            const destroyUser = await User.findOneAndDelete({ _id: req.params.userId });
 
             if (!destroyUser) {
                 res.status(404).json({ message: "No user found with that Id" })
@@ -114,7 +113,11 @@ module.exports = {
         try {
             const user = await User.findOneAndUpdate(
                 { _id: req.params.userId },
-                { $addToSet: { friends: req.body } },
+                {
+                    $addToSet: {
+                        friends: req.params.friendId
+                    }
+                },
                 { runValidators: true, new: true }
             );
             if (!user) {
@@ -133,7 +136,7 @@ module.exports = {
         try {
             const user = await User.findOneAndUpdate(
                 { _id: req.params.userId },
-                { $pull: { friends: { ObjectId: req.params.ObjectId } } },
+                { $pull: { friends: req.params.friendId } },
                 { runValidators: true, new: true }
             );
 
@@ -146,11 +149,4 @@ module.exports = {
             res.status(500).json(err);
         }
     }
-
-
-
-
-
-
-
 };

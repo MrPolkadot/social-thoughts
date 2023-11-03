@@ -3,7 +3,7 @@ const { connect, connection } = require("mongoose");
 
 const connectionString = process.env.MONGODB_URI || "mongodb://localhost:27017/thoughtsDB";
 
-connect(connectionString);
+connect(connectionString).then(() => { console.log("connected") }, err => { console.log(err) });
 
 
 module.exports = connection;
