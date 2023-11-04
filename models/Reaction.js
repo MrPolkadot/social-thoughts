@@ -1,4 +1,6 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, Types } = require("mongoose");
+//Imported dayjs to format the timestamp
+const dayjs = require("dayjs");
 
 const reactionSchema = new Schema(
     {
@@ -17,9 +19,17 @@ const reactionSchema = new Schema(
         },
         createdAt: {
             type: Date,
-            default: Date.now
+            default: Date.now,
+            get: dateFormat => dayjs(dateFormat).format("MM/DD/YYYY HH:mm:ss")
             //add getter method to format the timestamp on query
         },
+    },
+    {
+        toJSON: {
+            virtuals: true,
+            getters: true
+        },
+        id: false,
     }
 )
 

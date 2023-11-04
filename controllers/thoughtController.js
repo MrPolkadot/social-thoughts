@@ -123,7 +123,7 @@ module.exports = {
                 return res.status(404).json({ message: "Reaction not found with that id" });
             }
 
-            res.json(reaction);
+            res.json("Reaction deleted.");
         } catch (err) {
             res.status(500).json(err);
         }
